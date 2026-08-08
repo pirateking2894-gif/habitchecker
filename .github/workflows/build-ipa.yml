@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: macos-14
+    env:
+      HOMEBREW_NO_REQUIRE_TAP_TRUST: 1
 
     steps:
       - name: Checkout repo
