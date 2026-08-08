@@ -2,13 +2,6 @@
 //  HabitChecker.swift
 //  A simple habit checker for iPhone (SwiftUI)
 //
-//  HOW TO USE:
-//  1. Open Xcode → File → New → Project → iOS → App
-//  2. Product Name: "HabitChecker", Interface: SwiftUI, Language: Swift
-//  3. Delete the auto-generated ContentView.swift and HabitCheckerApp.swift
-//  4. Drag this file into the project (make sure "Copy items if needed" is checked)
-//  5. Build & Run (⌘R) on an iPhone simulator or device
-//
 
 import SwiftUI
 
@@ -68,14 +61,11 @@ final class HabitStore: ObservableObject {
         habit.completedDates.contains(dayComponents(for: Date()))
     }
 
-    /// Current consecutive-day streak, counting back from today (or yesterday
-    /// if today isn't done yet, so a streak isn't lost until the day is over).
     func currentStreak(for habit: Habit) -> Int {
         var streak = 0
         var day = Date()
 
         if !habit.completedDates.contains(dayComponents(for: day)) {
-            // Today not done yet — check if yesterday keeps the streak alive.
             guard let yesterday = calendar.date(byAdding: .day, value: -1, to: day) else { return 0 }
             day = yesterday
         }
@@ -87,8 +77,6 @@ final class HabitStore: ObservableObject {
         }
         return streak
     }
-
-    // MARK: Helpers
 
     private func dayComponents(for date: Date) -> DateComponents {
         calendar.dateComponents([.year, .month, .day], from: date)
@@ -210,3 +198,27 @@ struct AddHabitSheet: View {
                     Button("Cancel") { isPresented = false }
                 }
                 ToolbarItem(placement: .confirmationAction) {
+                    Button("Add", action: addAndClose)
+                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+        .onAppear { isFocused = true }
+    }
+
+    private func addAndClose() {
+        store.addHabit(named: name)
+        isPresented = false
+    }
+}
+
+// MARK: - App entry point
+
+@main
+struct HabitCheckerApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
